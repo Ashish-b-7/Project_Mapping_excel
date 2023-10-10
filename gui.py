@@ -5,7 +5,7 @@ import re
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-def process_files(normal_file_path, mapping_file_path):
+def process_files(normal_file_path, mapping_file_path, filename):
     # Read the uploaded files
     Upload_file = pd.read_excel(normal_file_path)
     Mapping_file = pd.read_excel(mapping_file_path)
@@ -99,10 +99,12 @@ def process_files(normal_file_path, mapping_file_path):
     merged_data.loc[condition13, ['Productive/Non Productive', 'Billable/Non Billable']] = ['Productive', 'Non Billable']
     merged_data.loc[condition14, ['Productive/Non Productive', 'Billable/Non Billable']] = ['Productive', 'Non Billable']
 
-    # Save the merged data to a new Excel file
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], 'Output1.xlsx')
+    #Save the merged data to a new Excel file
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     merged_data.to_excel(output_path, index=False)
     return output_path
+
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -112,14 +114,15 @@ def upload():
 
     normal_file = request.files['normal_file']
     mapping_file = request.files['mapping_file']
-
+    # print(normal_file)
+    # exit()
     normal_file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'normal_file.xlsx')
     mapping_file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'mapping_file.xlsx')
 
     normal_file.save(normal_file_path)
     mapping_file.save(mapping_file_path)
 
-    output_path = process_files(normal_file_path, mapping_file_path)
+    output_path = process_files(normal_file_path, mapping_file_path,normal_file.filename)
 
 
 
